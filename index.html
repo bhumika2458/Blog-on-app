@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Mind</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a0033 50%, #000428 100%);
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(120,119,198,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,119,198,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120,219,255,0.2) 0%, transparent 50%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+            url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300ff88' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            text-align: center;
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 900;
+            background: linear-gradient(45deg, #00ff88, #00b7ff, #ff00ff, #ffaa00);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite, glow 2s ease-in-out infinite alternate;
+            margin-bottom: 40px;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.5)); }
+            to { filter: drop-shadow(0 0 40px rgba(0, 255, 136, 0.8)); }
+        }
+        
+        .input-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .nickname-input {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+            width: 300px;
+            max-width: 90vw;
+        }
+        
+        .nickname-input:focus {
+            border-color: #00ff88;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #00ff88, #00b7ff);
+            color: #000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 255, 136, 0.5);
+        }
+        
+        .progress-section {
+            display: none;
+            text-align: center;
+            margin: 50px 0;
+        }
+        
+        .welcome-user {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #00ff88;
+        }
+        
+        .level-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 60px 0;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .level-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.8rem;
+            position: relative;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+            border: 4px solid rgba(0, 255, 136, 0.3);
+        }
+        
+        .level-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.6);
+        }
+        
+        .level-1 { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+        .level-2 { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .level-3 { background: linear-gradient(135deg, #45b7d1, #96c93d); }
+        
+        .level-1.completed, .level-2.completed { border-color: #00ff88; box-shadow: 0 0 30px rgba(0, 255, 136, 0.8); }
+        .level-3.completed { border-color: #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+        
+        .level-connector {
+            height: 4px;
+            width: 150px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.5), transparent);
+            position: relative;
+            animation: dash 2s linear infinite;
+        }
+        
+        @keyframes dash {
+            0% { background-position: 0 0; }
+            100% { background-position: 200px 0; }
+        }
+        
+        .rabbit {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            animation: hop 0.6s infinite alternate;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes hop {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+        
+        .content-section {
+            display: none;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .content-section.active { display: block; }
+        
+        .mcq-question {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            color: #00ff88;
+        }
+        
+        .mcq-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .mcq-option {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .mcq-option:hover {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: rgba(0, 255, 136, 0.5);
+        }
+        
+        .mcq-option.correct { background: rgba(0, 255, 0, 0.3); border-color: #00ff88; }
+        .mcq-option.incorrect { background: rgba(255, 0, 0, 0.3); border-color: #ff4444; }
+        
+        .score-section {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 30px 0;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .quotes-section {
+            display: none;
+            text-align: center;
+            margin: 50px 0;
+        }
+        
+        .quote {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-family: 'Orbitron', monospace;
+            font-weight: 300;
+            font-style: italic;
+            margin: 40px 0;
+            background: linear-gradient(45deg, #00ff88, #00b7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+            position: relative;
+        }
+        
+        .quote:nth-child(2) { animation-delay: 0.5s; }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">**Secure Mind**</h1>
+        
+        <div id="nicknameSection" class="input-section">
+            <input type="text" id="nicknameInput" class="nickname-input" placeholder="Enter your nickname..." maxlength="20">
+            <br><br>
+            <button onclick="startApp()" class="btn">Enter Secure World</button>
+        </div>
+        
+        <div id="progressSection" class="progress-section hidden">
+            <div id="welcomeUser" class="welcome-user"></div>
+            <div class="level-container">
+                <div class="level-circle level-1" onclick="startLevel(1)">
+                    <div>1</div>
+                    <div style="font-size: 0.8rem; margin-top: 5px;">Cybersecurity</div>
+                </div>
+                <div class="level-connector"></div>
+                <div class="level-circle level-2" onclick="startLevel(2)">
+                    <div>2</div>
+                    <div style="font-size: 0.8rem; margin-top: 5px;">Network</div>
+                </div>
+                <div class="level-connector"></div>
+                <div class="level-circle level-3" onclick="startLevel(3)">
+                    <div>3</div>
+                    <div style="font-size: 0.8rem; margin-top: 5px;">Linux</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content Sections -->
+        <div id="contentCyber" class="content-section">
+            <h2 style="text-align: center; color: #ff6b6b; margin-bottom: 30px; font-family: 'Orbitron';">🔒 Cybersecurity Essentials</h2>
+            <div class="learning-content">
+                <h3>Key Terms:</h3>
+                <ul style="margin: 20px 0; padding-left: 20px;">
+                    <li><strong>Firewall:</strong> Network security system that monitors traffic [web:1]</li>
+                    <li><strong>Encryption:</strong> Converting data into secure format [web:1]</li>
+                    <li><strong>Phishing:</strong> Fraudulent email attacks [web:1]</li>
+                </ul>
+            </div>
+            <div class="mcq-question">What does a firewall do?</div>
+            <div class="mcq-options">
+                <div class="mcq-option" data-correct="true">Blocks unauthorized network traffic</div>
+                <div class="mcq-option" data-correct="false">Encrypts all data</div>
+                <div class="mcq-option" data-correct="false">Creates viruses</div>
+                <div class="mcq-option" data-correct="false">Manages email</div>
+            </div>
+            <button onclick="checkAnswer(1)" class="btn">Submit Answer</button>
+            <div id="scoreCyber" class="score-section hidden"></div>
+        </div>
+        
+        <div id="contentNetwork" class="content-section">
+            <h2 style="text-align: center; color: #4ecdc4; margin-bottom: 30px; font-family: 'Orbitron';">🌐 Network Security</h2>
+            <div class="learning-content">
+                <h3>Key Concepts:</h3>
+                <ul style="margin: 20px 0; padding-left: 20px;">
+                    <li><strong>VPN:</strong> Creates secure tunnel for data [web:2]</li>
+                    <li><strong>IDS:</strong> Intrusion Detection System [web:2]</li>
+                    <li><strong>Port Scanning:</strong> Reconnaissance technique [web:2]</li>
+                </ul>
+            </div>
+            <div class="mcq-question">What does VPN stand for?</div>
+            <div class="mcq-options">
+                <div class="mcq-option" data-correct="false">Virtual Private Network</div>
+                <div class="mcq-option" data-correct="true">Virtual Private Network</div>
+                <div class="mcq-option" data-correct="false">Very Protected Network</div>
+                <div class="mcq-option" data-correct="false">Virtual Public Network</div>
+            </div>
+            <button onclick="checkAnswer(2)" class="btn">Submit Answer</button>
+            <div id="scoreNetwork" class="score-section hidden"></div>
+        </div>
+        
+        <div id="contentLinux" class="content-section">
+            <h2 style="text-align: center; color: #45b7d1; margin-bottom: 30px; font-family: 'Orbitron';">🐧 Linux Security</h2>
+            <div class="learning-content">
+                <h3>Key Commands:</h3>
+                <ul style="margin: 20px 0; padding-left: 20px;">
+                    <li><strong>chmod:</strong> Change file permissions [web:3]</li>
+                    <li><strong>sudo:</strong> Execute with superuser privileges [web:3]</li>
+                    <li><strong>ufw:</strong> Uncomplicated Firewall [web:3]</li>
+                </ul>
+            </div>
+            <div class="mcq-question">Which command changes file permissions?</div>
+            <div class="mcq-options">
+                <div class="mcq-option" data-correct="false">sudo</div>
+                <div class="mcq-option" data-correct="true">chmod</div>
+                <div class="mcq-option" data-correct="false">ls</div>
+                <div class="mcq-option" data-correct="false">pwd</div>
+            </div>
+            <button onclick="checkAnswer(3)" class="btn">Submit Answer</button>
+            <div id="scoreLinux" class="score-section hidden"></div>
+        </div>
+        
+        <div id="quotesSection" class="quotes-section"></div>
+    </div>
+    
+    <script>
+        let currentUser = '';
+        let currentLevel = 0;
+        let levelScores = {1: 0, 2: 0, 3: 0};
+        const rabbit = document.createElement('div');
+        rabbit.className = 'rabbit';
+        rabbit.innerHTML = '🐇';
+        document.querySelector('.level-container').appendChild(rabbit);
+        
+        const quotes = [
+            [""Security is a process, not a product."", "- Bruce Schneier"],
+            [""The best way to secure your system is to unplug it."", "- Unknown"],
+            [""In cybersecurity, defense wins."", "- Modern Proverb"],
+            [""Trust, but verify."", "- Ronald Reagan"],
+            [""Prevention is better than cure."", "- Ancient Wisdom"],
+            [""Your data is only as secure as your weakest link."", "- Cybersecurity Axiom"]
+        ];
+        
+        function startApp() {
+            currentUser = document.getElementById('nicknameInput').value.trim() || 'Cyber Warrior';
+            document.getElementById('welcomeUser').textContent = `Welcome, ${currentUser}! Choose your learning path:`;
+            document.getElementById('nicknameSection').classList.add('hidden');
+            document.getElementById('progressSection').classList.remove('hidden');
+        }
+        
+        function startLevel(level) {
+            if (level > currentLevel + 1) return;
+            currentLevel = level;
+            hideAllContent();
+            document.getElementById(`content${['Cyber','Network','Linux'][level-1]}`).classList.add('active');
+            document.querySelectorAll('.mcq-option').forEach(opt => {
+                opt.classList.remove('correct', 'incorrect');
+                opt.onclick = () => selectOption(opt);
+            });
+        }
+        
+        function selectOption(option) {
+            document.querySelectorAll('.mcq-option').forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                if (opt.dataset.correct === 'true') {
+                    opt.classList.add('correct');
+                }
+            });
+        }
+        
+        function checkAnswer(level) {
+            const correct = Array.from(document.querySelectorAll(`#content${['Cyber','Network','Linux'][level-1]} .mcq-option[data-correct="true"]`)).length > 0;
+            levelScores[level] = correct ? 100 : 0;
+            
+            const scoreEl = document.getElementById(`score${['Cyber','Network','Linux'][level-1]}`);
+            scoreEl.textContent = correct ? '✅ Excellent! 100/100' : '❌ Keep Learning!';
+            scoreEl.classList.remove('hidden');
+            
+            document.querySelector(`.level-${level}`).classList.add('completed');
+            
+            setTimeout(() => {
+                if (level < 3) moveRabbit(level);
+                showQuotes(level);
+            }, 1500);
+        }
+        
+        function moveRabbit(fromLevel) {
+            const circles = document.querySelectorAll('.level-circle');
+            const fromCircle = circles[fromLevel - 1];
+            const toCircle = circles[fromLevel];
+            const containerRect = document.querySelector('.level-container').getBoundingClientRect();
+            
+            rabbit.style.left = (fromCircle.offsetLeft + fromCircle.offsetWidth/2 - 20) + 'px';
+            rabbit.style.top = (fromCircle.offsetTop + fromCircle.offsetHeight/2 - 20) + 'px';
+            rabbit.style.display = 'flex';
+            
+            setTimeout(() => {
+                rabbit.style.transition = 'left 2s ease, top 2s ease';
+                rabbit.style.left = (toCircle.offsetLeft + toCircle.offsetWidth/2 - 20) + 'px';
+                rabbit.style.top = (toCircle.offsetTop + toCircle.offsetHeight/2 - 20) + 'px';
+            }, 100);
+        }
+        
+        function showQuotes(level) {
+            const quotesSection = document.getElementById('quotesSection');
+            const randomQuotes = quotes.slice(0, 2).map((q, i) => 
+                `<div class="quote">${q[0]}<br><span style="font-size: 0.6em; opacity: 0.8;">${q[1]}</span></div>`
+            ).join('');
+            quotesSection.innerHTML = randomQuotes;
+            quotesSection.style.display = 'block';
+            document.querySelector('.content-section.active').style.display = 'none';
+        }
+        
+        function hideAllContent() {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('quotesSection').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
